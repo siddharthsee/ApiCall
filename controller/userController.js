@@ -1,15 +1,20 @@
-module.exports={
-    get:(req,res)=>{
-        console.log('hi')
-        res.send('user:Sid ')
-    }
-};
+const { Sequelize } = require('sequelize');
+const user = require('../db/models/user');
+const catchAsync = require('../utils/catchAsync');
 
+const getAllUser = catchAsync(async (req, res, next) => {
+    const users = await user.findAndCountAll({
+        where: {
+            userType: {
+                [Sequelize.Op.ne]: '0',
+            },
+        },
+        attributes: { exclude: ['password'] },
+    });
+    return res.status(200).json({
+        status: 'success',
+        data: users,
+    });
+});
 
-
-//     controller.get('/out',(req,res)=>{
-//         res.send('success')
-//    });
-
-
-
+module.exports = { getAllUser };
